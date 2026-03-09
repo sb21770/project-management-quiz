@@ -1,0 +1,1047 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Project Management Final Test – Hitech Industry</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --card: #1c2128;
+    --border: #30363d;
+    --accent: #58a6ff;
+    --accent2: #3fb950;
+    --danger: #f85149;
+    --warn: #e3b341;
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --tag: #238636;
+    --radius: 10px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'IBM Plex Sans', sans-serif;
+    min-height: 100vh;
+    padding: 0 0 60px;
+  }
+
+  /* ─── Header ─── */
+  header {
+    background: linear-gradient(135deg, #0d1117 0%, #1a2a3a 50%, #0d1117 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 32px 20px 24px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 60% 80% at 50% -20%, rgba(88,166,255,.15) 0%, transparent 70%);
+  }
+  .header-badge {
+    display: inline-block;
+    background: rgba(88,166,255,.12);
+    border: 1px solid rgba(88,166,255,.3);
+    color: var(--accent);
+    font-size: .72rem;
+    font-weight: 600;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    padding: 4px 14px;
+    border-radius: 20px;
+    margin-bottom: 14px;
+  }
+  header h1 {
+    font-size: clamp(1.4rem, 4vw, 2.1rem);
+    font-weight: 700;
+    letter-spacing: -.02em;
+    position: relative;
+  }
+  header p {
+    color: var(--muted);
+    margin-top: 8px;
+    font-size: .9rem;
+    position: relative;
+  }
+
+  /* ─── Progress bar ─── */
+  #progress-wrap {
+    max-width: 800px;
+    margin: 24px auto 0;
+    padding: 0 20px;
+  }
+  .prog-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: .8rem;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+  .prog-bar-track {
+    height: 6px;
+    background: var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .prog-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 10px;
+    transition: width .4s ease;
+    width: 0%;
+  }
+
+  /* ─── Quiz container ─── */
+  #quiz {
+    max-width: 800px;
+    margin: 28px auto 0;
+    padding: 0 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  /* ─── Question card ─── */
+  .q-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    transition: border-color .2s;
+  }
+  .q-card.answered { border-color: rgba(88,166,255,.25); }
+  .q-card.correct  { border-color: rgba(63,185,80,.4); }
+  .q-card.wrong    { border-color: rgba(248,81,73,.35); }
+
+  .q-header {
+    background: var(--surface);
+    padding: 14px 18px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  .q-num {
+    flex-shrink: 0;
+    width: 28px; height: 28px;
+    border-radius: 6px;
+    background: rgba(88,166,255,.15);
+    border: 1px solid rgba(88,166,255,.3);
+    color: var(--accent);
+    font-size: .75rem;
+    font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    margin-top: 2px;
+  }
+  .q-text {
+    font-size: .97rem;
+    font-weight: 500;
+    line-height: 1.5;
+    flex: 1;
+  }
+  .q-type-tag {
+    flex-shrink: 0;
+    font-size: .65rem;
+    font-weight: 600;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 4px;
+    margin-top: 3px;
+  }
+  .tag-single { background: rgba(88,166,255,.12); color: var(--accent); border: 1px solid rgba(88,166,255,.2); }
+  .tag-multi  { background: rgba(227,179,65,.1);  color: var(--warn);   border: 1px solid rgba(227,179,65,.2); }
+
+  .q-body { padding: 14px 18px; }
+
+  .q-hint {
+    font-size: .75rem;
+    color: var(--muted);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .q-hint svg { flex-shrink: 0; }
+
+  /* ─── Options ─── */
+  .options { display: flex; flex-direction: column; gap: 9px; }
+
+  label.opt {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 11px 14px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background .15s, border-color .15s;
+    position: relative;
+    user-select: none;
+  }
+  label.opt:hover { background: rgba(255,255,255,.03); border-color: rgba(88,166,255,.3); }
+
+  .opt-indicator {
+    flex-shrink: 0;
+    width: 18px; height: 18px;
+    border: 2px solid var(--border);
+    border-radius: 50%;
+    margin-top: 1px;
+    display: flex; align-items: center; justify-content: center;
+    transition: all .15s;
+    background: transparent;
+  }
+  .multi .opt-indicator { border-radius: 4px; }
+
+  input[type=radio], input[type=checkbox] { display: none; }
+
+  input:checked + .opt-indicator {
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+  input:checked + .opt-indicator::after {
+    content: '✓';
+    color: #000;
+    font-size: .65rem;
+    font-weight: 900;
+    line-height: 1;
+  }
+
+  .opt-text { font-size: .9rem; line-height: 1.5; flex: 1; }
+
+  /* Results state */
+  label.opt.reveal-correct { background: rgba(63,185,80,.1); border-color: rgba(63,185,80,.5); }
+  label.opt.reveal-wrong   { background: rgba(248,81,73,.08); border-color: rgba(248,81,73,.4); }
+  label.opt.reveal-missed  { background: rgba(63,185,80,.06); border-color: rgba(63,185,80,.3); outline: 2px dashed rgba(63,185,80,.4); }
+
+  .reveal-correct .opt-text::after { content: ' ✓'; color: var(--accent2); font-weight: 700; }
+  .reveal-wrong .opt-text::after   { content: ' ✗'; color: var(--danger); font-weight: 700; }
+
+  /* Q feedback */
+  .q-feedback {
+    margin-top: 12px;
+    padding: 10px 14px;
+    border-radius: 7px;
+    font-size: .84rem;
+    line-height: 1.5;
+    display: none;
+  }
+  .q-feedback.show { display: block; }
+  .q-feedback.ok   { background: rgba(63,185,80,.1); border: 1px solid rgba(63,185,80,.3); color: #7ee787; }
+  .q-feedback.err  { background: rgba(248,81,73,.08); border: 1px solid rgba(248,81,73,.25); color: #ff7b72; }
+
+  /* ─── Submit + Reset buttons ─── */
+  #btn-area {
+    max-width: 800px;
+    margin: 28px auto 0;
+    padding: 0 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+  }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 13px 32px;
+    border-radius: 8px;
+    font-size: .95rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: opacity .15s, transform .1s;
+  }
+  .btn:active { transform: scale(.97); }
+  .btn-primary {
+    background: var(--accent);
+    color: #000;
+    width: 100%;
+    max-width: 360px;
+    justify-content: center;
+  }
+  .btn-primary:hover { opacity: .88; }
+  .btn-primary:disabled { opacity: .4; cursor: default; }
+  .btn-reset {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    width: 100%;
+    max-width: 360px;
+    justify-content: center;
+  }
+  .btn-reset:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* ─── Results panel ─── */
+  #results {
+    display: none;
+    max-width: 800px;
+    margin: 28px auto 0;
+    padding: 0 20px;
+  }
+  .results-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 28px 24px;
+    text-align: center;
+  }
+  .score-ring {
+    width: 120px; height: 120px;
+    border-radius: 50%;
+    margin: 0 auto 20px;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    font-size: 2rem; font-weight: 700;
+    position: relative;
+  }
+  .score-ring::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 5px solid var(--border);
+  }
+  .score-ring .score-val { line-height: 1; }
+  .score-ring .score-of  { font-size: .75rem; font-weight: 400; color: var(--muted); margin-top: 2px; }
+
+  .grade-label {
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .grade-sub { color: var(--muted); font-size: .9rem; margin-bottom: 20px; }
+
+  .stats-row {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-bottom: 24px;
+  }
+  .stat-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 20px;
+    min-width: 100px;
+  }
+  .stat-box .sv { font-size: 1.4rem; font-weight: 700; }
+  .stat-box .sl { font-size: .72rem; color: var(--muted); margin-top: 2px; text-transform: uppercase; letter-spacing: .07em; }
+  .stat-correct .sv { color: var(--accent2); }
+  .stat-wrong .sv   { color: var(--danger); }
+  .stat-skip .sv    { color: var(--warn); }
+
+  /* ─── Mobile tweaks ─── */
+  @media (max-width: 520px) {
+    header { padding: 24px 16px 20px; }
+    .q-header { padding: 12px 14px; gap: 10px; }
+    .q-body { padding: 12px 14px; }
+    .q-num { width: 24px; height: 24px; font-size: .7rem; }
+    .q-text { font-size: .9rem; }
+    .opt-text { font-size: .85rem; }
+    label.opt { padding: 10px 12px; }
+    .results-card { padding: 20px 16px; }
+    .stats-row { gap: 10px; }
+    .stat-box { padding: 10px 14px; min-width: 80px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-badge">Project Management · Hitech Industry</div>
+  <h1>Final Test</h1>
+  <p>34 Questions &nbsp;·&nbsp; Shay Arad &nbsp;·&nbsp; All Topics</p>
+</header>
+
+<div id="progress-wrap">
+  <div class="prog-meta">
+    <span id="prog-label">0 / 34 answered</span>
+    <span id="prog-pct">0%</span>
+  </div>
+  <div class="prog-bar-track"><div class="prog-bar-fill" id="prog-fill"></div></div>
+</div>
+
+<div id="quiz"></div>
+
+<div id="btn-area">
+  <button class="btn btn-primary" id="btn-submit" onclick="submitQuiz()">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1ZM0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm11.78-1.72a.75.75 0 0 0-1.06-1.06L6.75 9.19 5.28 7.72a.75.75 0 0 0-1.06 1.06l2 2a.75.75 0 0 0 1.06 0l4.5-4.5Z"/></svg>
+    Submit Test
+  </button>
+  <button class="btn btn-reset" id="btn-reset" onclick="resetQuiz()">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z"/></svg>
+    Clear &amp; Restart
+  </button>
+</div>
+
+<div id="results">
+  <div class="results-card">
+    <div class="score-ring" id="score-ring">
+      <div class="score-val" id="score-val">–</div>
+      <div class="score-of">/ 34</div>
+    </div>
+    <div class="grade-label" id="grade-label"></div>
+    <div class="grade-sub" id="grade-sub"></div>
+    <div class="stats-row">
+      <div class="stat-box stat-correct"><div class="sv" id="stat-c">0</div><div class="sl">Correct</div></div>
+      <div class="stat-box stat-wrong"><div class="sv" id="stat-w">0</div><div class="sl">Wrong</div></div>
+      <div class="stat-box stat-skip"><div class="sv" id="stat-s">0</div><div class="sl">Skipped</div></div>
+    </div>
+    <button class="btn btn-reset" style="margin:0 auto;display:flex;" onclick="resetQuiz()">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z"/></svg>
+      Take Test Again
+    </button>
+  </div>
+</div>
+
+<script>
+const QUESTIONS = [
+  {
+    text: "What are the 3 conditions that determine a project?",
+    type: "multi",
+    correct: [0, 1, 2],
+    options: [
+      "It is temporary – has a defined start and end date",
+      "It produces a unique deliverable (product, service, or result)",
+      "It is progressively elaborated as more information becomes available",
+      "It is a repetitive, ongoing operational activity",
+      "It must involve more than 10 team members",
+      "It requires external funding from a third party"
+    ]
+  },
+  {
+    text: "What are 3 reasons for project failures?",
+    type: "multi",
+    correct: [0, 1, 2],
+    options: [
+      "Poor planning and unrealistic expectations",
+      "Lack of clear communication among stakeholders",
+      "Scope creep and undefined or changing requirements",
+      "Having too many highly skilled team members",
+      "Applying agile methodology in software projects",
+      "Holding frequent stakeholder review meetings"
+    ]
+  },
+  {
+    text: "What are the 5 main KPIs of a project?",
+    type: "multi",
+    correct: [0, 1, 2, 3, 4],
+    options: [
+      "Schedule / On-time delivery",
+      "Budget / Cost performance",
+      "Scope completion",
+      "Quality of deliverables",
+      "Customer / Stakeholder satisfaction",
+      "Number of team meetings held",
+      "Total lines of code written"
+    ]
+  },
+  {
+    text: "What are the phases of the project management life cycle?",
+    type: "multi",
+    correct: [0, 1, 2, 3, 4],
+    options: [
+      "Initiation",
+      "Planning",
+      "Execution",
+      "Monitoring & Control",
+      "Closure",
+      "Discovery",
+      "Deployment"
+    ]
+  },
+  {
+    text: "What are the 3 main skills of a project manager?",
+    type: "multi",
+    correct: [0, 1, 2],
+    options: [
+      "Leadership – inspiring and guiding the team",
+      "Communication – clearly conveying information to all parties",
+      "Problem-solving & decision-making under uncertainty",
+      "Advanced software coding and development skills",
+      "Financial auditing and forensic accounting",
+      "Graphic design and UI/UX expertise"
+    ]
+  },
+  {
+    text: "What are 5 steps for successful storytelling?",
+    type: "multi",
+    correct: [0, 1, 2, 3, 4],
+    options: [
+      "Set the context / situation",
+      "Introduce the challenge or conflict",
+      "Present the solution or resolution",
+      "Include relatable characters or people",
+      "End with a clear call to action",
+      "Fill every slide with data charts and tables",
+      "Avoid any form of emotional language"
+    ]
+  },
+  {
+    text: "What are the 5 stages in a Waterfall process?",
+    type: "multi",
+    correct: [0, 1, 2, 3, 4],
+    options: [
+      "Requirements gathering & analysis",
+      "System & software design",
+      "Implementation / coding",
+      "Testing & verification",
+      "Deployment & maintenance",
+      "Sprint review & retrospective",
+      "Backlog grooming"
+    ]
+  },
+  {
+    text: "What are the main disadvantages of the Waterfall process?",
+    type: "multi",
+    correct: [0, 1, 2],
+    options: [
+      "Inflexible – difficult to accommodate requirement changes mid-project",
+      "Testing happens late, making defects very costly to fix",
+      "The customer only sees the final product at the end of the cycle",
+      "Too many iterations make progress tracking difficult",
+      "It requires daily standups and agile ceremonies",
+      "Documentation is completely absent in the Waterfall model"
+    ]
+  },
+  {
+    text: "What are the 5 stages in an Agile process?",
+    type: "multi",
+    correct: [0, 1, 2, 3, 4],
+    options: [
+      "Concept / Ideation",
+      "Inception / Requirements",
+      "Iteration / Development Sprints",
+      "Release / Deployment",
+      "Maintenance / Continuous Feedback",
+      "Waterfall Transition phase",
+      "Final Code Freeze"
+    ]
+  },
+  {
+    text: "What is a User Story?",
+    type: "single",
+    correct: [0],
+    options: [
+      "A short description of a feature written from the end-user's perspective: 'As a [user], I want [goal] so that [benefit]'",
+      "A technical specification document written by senior developers",
+      "A detailed test case document created by QA engineers",
+      "A project charter reviewed and approved by the sponsor",
+      "A sprint planning meeting agenda distributed to the team"
+    ]
+  },
+  {
+    text: "What is a Sprint?",
+    type: "single",
+    correct: [0],
+    options: [
+      "A time-boxed iteration (typically 1–4 weeks) in Scrum during which a set of backlog items are completed",
+      "A daily 15-minute team standup meeting",
+      "A production release to end users",
+      "A critical bug logged in the agile tracking system",
+      "A document listing all project requirements and acceptance criteria"
+    ]
+  },
+  {
+    text: "What are 3 ceremonies of Agile methodology?",
+    type: "multi",
+    correct: [0, 1, 2],
+    options: [
+      "Sprint Planning",
+      "Daily Standup (Daily Scrum)",
+      "Sprint Retrospective",
+      "Project Kickoff meeting",
+      "Annual Budget Review",
+      "Quarterly Stakeholder Presentation"
+    ]
+  },
+  {
+    text: "What are the 3 pillars of the Scrum framework?",
+    type: "multi",
+    correct: [0, 1, 2],
+    options: [
+      "Transparency – making all work visible to everyone",
+      "Inspection – regularly examining progress toward the goal",
+      "Adaptation – adjusting when inspection reveals issues",
+      "Velocity – measuring how fast the team can work",
+      "Collaboration – working closely with stakeholders",
+      "Estimation – pointing story complexity accurately"
+    ]
+  },
+  {
+    text: "What is the core practice of the Kanban approach?",
+    type: "single",
+    correct: [0],
+    options: [
+      "Visualizing workflow on a board and limiting Work In Progress (WIP) to improve flow",
+      "Holding daily retrospectives with the entire development team",
+      "Dividing all work into fixed 2-week sprints with a dedicated backlog",
+      "Using a product backlog and story points to prioritize all features",
+      "Assigning a Scrum Master to remove impediments each day"
+    ]
+  },
+  {
+    text: "What is WBS?",
+    type: "single",
+    correct: [0],
+    options: [
+      "Work Breakdown Structure – a hierarchical decomposition of project scope into smaller, manageable deliverables",
+      "Weekly Budget Summary – a financial report produced every week for sponsors",
+      "Workflow Building System – an automation tool for business processes",
+      "Work Balance Sheet – an HR document used for resource allocation and capacity planning",
+      "Waterfall Breakdown Schedule – a phase-based timeline for sequential projects"
+    ]
+  },
+  {
+    text: "What is SOW?",
+    type: "single",
+    correct: [0],
+    options: [
+      "Statement of Work – a formal document defining project scope, deliverables, milestones, and contractual terms",
+      "Scope of Workflow – a flowchart diagram mapping out all project tasks and processes",
+      "Summary of Work – a brief weekly recap sent to stakeholders",
+      "Schedule of Warnings – a risk register used in agile environments",
+      "System of Work – a general methodology framework for productivity"
+    ]
+  },
+  {
+    text: "What are 3 key practices of team management?",
+    type: "multi",
+    correct: [0, 1, 2],
+    options: [
+      "Clear communication of goals, roles, and expectations",
+      "Effective delegation of tasks based on team members' skills",
+      "Regular feedback, recognition, and performance monitoring",
+      "Micromanaging every team member's daily tasks and hours",
+      "Avoiding conflict by ignoring interpersonal issues",
+      "Reducing all team meetings to save time at all costs"
+    ]
+  },
+  {
+    text: "What kinds of task dependencies exist in time management?",
+    type: "multi",
+    correct: [0, 1, 2, 3],
+    options: [
+      "Finish-to-Start (FS) – Task B can start only after Task A finishes",
+      "Start-to-Start (SS) – Task B can start when Task A starts",
+      "Finish-to-Finish (FF) – Task B finishes when Task A finishes",
+      "Start-to-Finish (SF) – Task B finishes after Task A starts",
+      "End-to-Begin (EB) – a non-standard fictional dependency type",
+      "Parallel-to-Series (PS) – tasks running simultaneously and sequentially"
+    ]
+  },
+  {
+    text: "What are the main benefits of effective time management?",
+    type: "multi",
+    correct: [0, 1, 2],
+    options: [
+      "On-time delivery and consistent meeting of deadlines",
+      "Better resource utilization and reduced waste",
+      "Reduced team stress and improved morale",
+      "Complete elimination of all project risks",
+      "Automatic budget approval from financial stakeholders",
+      "Guaranteed customer satisfaction without any quality checks"
+    ]
+  },
+  {
+    text: "What are common items in budget management?",
+    type: "multi",
+    correct: [0, 1, 2, 3],
+    options: [
+      "Labor / Human resource costs",
+      "Equipment and materials costs",
+      "Overhead and administrative costs",
+      "Contingency reserve for identified risks",
+      "Personal employee expenses (meals, transport)",
+      "Marketing campaign creative costs (non-PM)"
+    ]
+  },
+  {
+    text: "What is the difference between T&M and Fixed Price?",
+    type: "single",
+    correct: [0],
+    options: [
+      "T&M (Time & Materials): client pays for actual hours worked + materials used. Fixed Price: a single agreed total cost regardless of actual effort.",
+      "T&M: a fixed contract with milestone payments. Fixed Price: billed by hourly rate.",
+      "T&M: used exclusively in agile projects. Fixed Price: used exclusively in waterfall.",
+      "T&M: the vendor absorbs all risk of overrun. Fixed Price: the client bears all risk.",
+      "There is no real difference – both models pay based on delivered output only."
+    ]
+  },
+  {
+    text: "What are the 3 levels of quality in project management?",
+    type: "multi",
+    correct: [0, 1, 2],
+    options: [
+      "Quality Planning – defining quality standards and how to achieve them",
+      "Quality Assurance – auditing processes to ensure standards are consistently followed",
+      "Quality Control – inspecting and measuring outputs against defined standards",
+      "Quality Enforcement – applying financial penalties for non-compliance",
+      "Quality Reporting – generating dashboards for management review only",
+      "Quality Estimation – predicting quality levels before any work begins"
+    ]
+  },
+  {
+    text: "What is the process of stakeholder management?",
+    type: "multi",
+    correct: [0, 1, 2, 3, 4],
+    options: [
+      "Identify stakeholders",
+      "Analyze their influence, interest, and expectations",
+      "Plan an engagement strategy for each stakeholder group",
+      "Manage, communicate with, and engage stakeholders",
+      "Monitor engagement effectiveness and adjust approach",
+      "Remove low-interest stakeholders from all communications",
+      "Create a separate product backlog for each stakeholder"
+    ]
+  },
+  {
+    text: "What are the 3 kinds of risks in project management?",
+    type: "multi",
+    correct: [0, 1, 2],
+    options: [
+      "Known risks – clearly identified and planned for in the risk register",
+      "Known unknowns – areas of uncertainty we know exist but haven't fully defined",
+      "Unknown unknowns – risks we cannot anticipate or foresee at all",
+      "Internal risks only – risks that arise exclusively from within the project team",
+      "Fixed risks – risks that remain constant and never evolve during the project",
+      "Zero risks – projects where no risks have been identified whatsoever"
+    ]
+  },
+  {
+    text: "What parameters must we evaluate for each risk?",
+    type: "multi",
+    correct: [0, 1, 2],
+    options: [
+      "Probability / Likelihood – how likely the risk is to occur",
+      "Impact / Severity – the consequence if the risk materializes",
+      "Risk Score = Probability × Impact (used to prioritize risks)",
+      "The name of the team member who first identified the risk",
+      "The color coding used in the project status dashboard",
+      "How many times the risk was mentioned in team meetings"
+    ]
+  },
+  {
+    text: "What is RACI?",
+    type: "single",
+    correct: [0],
+    options: [
+      "A responsibility assignment matrix: Responsible, Accountable, Consulted, Informed – used to clarify roles for each task",
+      "A risk assessment checklist: Risk, Assumption, Constraint, Issue – used in risk management",
+      "A project performance model: Results, Accuracy, Compliance, Integrity – a KPI framework",
+      "An agile framework: Release, Adapt, Collaborate, Iterate – for continuous delivery",
+      "A communication protocol: Report, Alert, Confirm, Implement – for escalation procedures"
+    ]
+  },
+  {
+    text: "What are the two communication approaches in project management?",
+    type: "multi",
+    correct: [0, 1],
+    options: [
+      "Push communication – the sender actively pushes information to receivers (emails, reports, memos)",
+      "Pull communication – recipients access information on demand (portals, knowledge bases, shared drives)",
+      "Loud communication – announcements broadcast in all-hands team meetings",
+      "Silent communication – conveying meaning through non-verbal cues only",
+      "Reactive communication – only responding when someone explicitly asks for information"
+    ]
+  },
+  {
+    text: "What are the top 3 parameters to evaluate a project change request?",
+    type: "multi",
+    correct: [0, 1, 2],
+    options: [
+      "Impact on project scope",
+      "Impact on timeline / schedule",
+      "Impact on budget / cost",
+      "Impact on team members' vacation scheduling",
+      "Impact on the project name or branding assets",
+      "Impact on the office floor layout or seating arrangement"
+    ]
+  },
+  {
+    text: 'Jira query: all NOT-CLOSED tickets connected to epic "Panda" in project "Bear"',
+    type: "single",
+    correct: [0],
+    options: [
+      'project = "Bear" AND "Epic Link" = "Panda" AND status != Closed',
+      'project = "Bear" AND sprint = "Panda" AND status = Open',
+      'epic = "Panda" AND project != "Bear" AND status != Done',
+      'project = "Bear" AND label = "Panda" AND status = Closed',
+      'project IN ("Bear", "Panda") AND status != Closed'
+    ]
+  },
+  {
+    text: "Jira query: all BUGS created in the last 365 days where severity is CRITICAL",
+    type: "single",
+    correct: [0],
+    options: [
+      "issuetype = Bug AND created >= -365d AND priority = Critical",
+      "issuetype = Bug AND updated >= -365d AND severity = High",
+      "type = Bug AND createdDate = last365days AND priority = Blocker",
+      "issuetype = Bug AND created <= -365d AND priority = Critical",
+      "project = ALL AND issuetype = Bug AND time = 365 AND priority = Critical"
+    ]
+  },
+  {
+    text: "What are the main differences in global project management?",
+    type: "multi",
+    correct: [0, 1, 2],
+    options: [
+      "Managing across different time zones and varying working hours",
+      "Navigating different legal, regulatory, and compliance frameworks per country",
+      "Coordinating distributed teams with diverse communication and work styles",
+      "All global teams are required to use the exact same project management methodology",
+      "Language differences are irrelevant when everyone speaks English",
+      "Physical distance has no measurable impact on team collaboration and performance"
+    ]
+  },
+  {
+    text: "What are the main cultural differences to consider in global management?",
+    type: "multi",
+    correct: [0, 1, 2],
+    options: [
+      "Different attitudes toward hierarchy and authority (high vs. low power distance cultures)",
+      "Different communication styles: direct (low-context) vs. indirect (high-context) cultures",
+      "Different approaches to time, punctuality, deadlines, and scheduling",
+      "All cultures share identical expectations for feedback and criticism",
+      "Cultural differences only apply to external customer-facing teams",
+      "Western management practices are universally accepted worldwide"
+    ]
+  },
+  {
+    text: "What is ZOPA?",
+    type: "single",
+    correct: [0],
+    options: [
+      "Zone Of Possible Agreement – the range where both parties' acceptable outcomes overlap, enabling a deal in negotiation",
+      "Zero Overhead Project Approach – a cost-reduction methodology for lean projects",
+      "Zone of Project Accountability – a responsibility matrix similar to RACI",
+      "Zero Out Project Assumptions – a technique for removing all assumptions before planning begins",
+      "Zone of Performance Assessment – a KPI evaluation framework for quarterly reviews"
+    ]
+  },
+  {
+    text: "What is the key statement of negotiation management?",
+    type: "single",
+    correct: [0],
+    options: [
+      "Negotiation aims for a mutually beneficial (win-win) agreement; parties should focus on underlying interests rather than fixed positions",
+      "The primary goal of negotiation is for one party to win while the other makes all the concessions",
+      "Effective negotiation means avoiding any form of compromise to maintain a strong position",
+      "Negotiation management relies on pressure tactics and deadlines to force agreement",
+      "The best strategy is to never reveal your bottom line or acceptable range to the other party"
+    ]
+  }
+];
+
+/* ─── Shuffle helper ─── */
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+/* ─── Build quiz ─── */
+let shuffledQuestions = [];
+
+function buildQuiz() {
+  shuffledQuestions = QUESTIONS.map((q, qi) => {
+    // Map correct option texts
+    const correctTexts = q.correct.map(i => q.options[i]);
+    // Shuffle options
+    const shuffledOpts = shuffle(q.options);
+    return { ...q, shuffledOpts, correctTexts, originalIndex: qi };
+  });
+
+  const container = document.getElementById('quiz');
+  container.innerHTML = '';
+
+  shuffledQuestions.forEach((q, qi) => {
+    const isMulti = q.type === 'multi';
+    const inputType = isMulti ? 'checkbox' : 'radio';
+    const tagClass = isMulti ? 'tag-multi' : 'tag-single';
+    const tagText  = isMulti ? 'Multi-select' : 'Single answer';
+    const hintText = isMulti
+      ? `Select all correct answers (${q.correct.length} correct)`
+      : 'Select one answer';
+
+    const optionsHTML = q.shuffledOpts.map((opt, oi) => `
+      <label class="opt ${isMulti ? 'multi' : ''}" id="lbl-${qi}-${oi}">
+        <input type="${inputType}" name="q${qi}" value="${oi}" onchange="onAnswer(${qi})">
+        <span class="opt-indicator"></span>
+        <span class="opt-text">${opt}</span>
+      </label>
+    `).join('');
+
+    container.innerHTML += `
+      <div class="q-card" id="qcard-${qi}">
+        <div class="q-header">
+          <div class="q-num">${qi + 1}</div>
+          <div class="q-text">${q.text}</div>
+          <div class="q-type-tag ${tagClass}">${tagText}</div>
+        </div>
+        <div class="q-body">
+          <div class="q-hint">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="${isMulti ? '#e3b341' : '#58a6ff'}"><path d="${isMulti
+              ? 'M2 1.75C2 .784 2.784 0 3.75 0h6.586c.464 0 .909.184 1.237.513l2.914 2.914c.329.328.513.773.513 1.237v9.586A1.75 1.75 0 0 1 13.25 16h-9.5A1.75 1.75 0 0 1 2 14.25Zm1.75-.25a.25.25 0 0 0-.25.25v12.5c0 .138.112.25.25.25h9.5a.25.25 0 0 0 .25-.25V6h-2.75A1.75 1.75 0 0 1 8.75 4.25V1.5Zm6.75.062V4.25c0 .138.112.25.25.25h2.688ZM8.75 9.5a.75.75 0 0 1 0 1.5h-1.5a.75.75 0 0 1 0-1.5Zm0-3a.75.75 0 0 1 0 1.5h-1.5a.75.75 0 0 1 0-1.5Z'
+              : 'M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1ZM0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm9 3a1 1 0 1 1-2 0 1 1 0 0 1 2 0ZM6.92 6.085c.081-.16.19-.299.34-.398.145-.097.371-.187.74-.187.28 0 .553.087.738.225A.613.613 0 0 1 9 6.25c0 .177-.04.264-.077.318a.956.956 0 0 1-.277.245c-.076.051-.158.1-.258.161l-.007.004a7.728 7.728 0 0 0-.313.195 2.416 2.416 0 0 0-.692.661.75.75 0 0 0 1.248.832 .916.916 0 0 1 .232-.253 6.3 6.3 0 0 1 .26-.16l.006-.004c.093-.057.204-.123.313-.195.222-.148.487-.351.707-.628.228-.285.39-.63.39-1.031 0-.563-.37-1.021-.868-1.305C9.253 4.86 8.787 4.75 8 4.75c-.636 0-1.218.15-1.667.437-.449.287-.78.707-.967 1.076a.75.75 0 0 0 1.332.692Z'
+            }"/></svg>
+            ${hintText}
+          </div>
+          <div class="options" id="opts-${qi}">${optionsHTML}</div>
+          <div class="q-feedback" id="fb-${qi}"></div>
+        </div>
+      </div>
+    `;
+  });
+
+  updateProgress();
+}
+
+function onAnswer(qi) {
+  updateProgress();
+}
+
+/* ─── Progress ─── */
+function getAnswered() {
+  let count = 0;
+  shuffledQuestions.forEach((q, qi) => {
+    const inputs = document.querySelectorAll(`input[name="q${qi}"]:checked`);
+    if (inputs.length > 0) count++;
+  });
+  return count;
+}
+
+function updateProgress() {
+  const ans = getAnswered();
+  const total = shuffledQuestions.length;
+  const pct = Math.round((ans / total) * 100);
+  document.getElementById('prog-label').textContent = `${ans} / ${total} answered`;
+  document.getElementById('prog-pct').textContent = `${pct}%`;
+  document.getElementById('prog-fill').style.width = `${pct}%`;
+}
+
+/* ─── Submit ─── */
+function submitQuiz() {
+  let correct = 0, wrong = 0, skipped = 0;
+
+  shuffledQuestions.forEach((q, qi) => {
+    const checked = Array.from(document.querySelectorAll(`input[name="q${qi}"]:checked`))
+      .map(el => parseInt(el.value));
+
+    const card = document.getElementById(`qcard-${qi}`);
+    const fb   = document.getElementById(`fb-${qi}`);
+
+    // Disable all inputs
+    document.querySelectorAll(`input[name="q${qi}"]`).forEach(el => el.disabled = true);
+
+    if (checked.length === 0) {
+      skipped++;
+      card.classList.add('wrong');
+      // Highlight correct answers
+      q.correctTexts.forEach(ct => {
+        const idx = q.shuffledOpts.indexOf(ct);
+        const lbl = document.getElementById(`lbl-${qi}-${idx}`);
+        if (lbl) lbl.classList.add('reveal-missed');
+      });
+      fb.textContent = 'Skipped – no answer selected.';
+      fb.className = 'q-feedback show err';
+      return;
+    }
+
+    // Check correctness
+    const selectedTexts = checked.map(i => q.shuffledOpts[i]);
+    const isCorrect =
+      selectedTexts.length === q.correctTexts.length &&
+      selectedTexts.every(t => q.correctTexts.includes(t));
+
+    // Reveal colors
+    checked.forEach(i => {
+      const lbl = document.getElementById(`lbl-${qi}-${i}`);
+      if (!lbl) return;
+      const txt = q.shuffledOpts[i];
+      if (q.correctTexts.includes(txt)) {
+        lbl.classList.add('reveal-correct');
+      } else {
+        lbl.classList.add('reveal-wrong');
+      }
+    });
+
+    // Show missed correct answers
+    if (!isCorrect) {
+      q.correctTexts.forEach(ct => {
+        const idx = q.shuffledOpts.indexOf(ct);
+        const lbl = document.getElementById(`lbl-${qi}-${idx}`);
+        if (lbl && !lbl.classList.contains('reveal-correct')) {
+          lbl.classList.add('reveal-missed');
+        }
+      });
+    }
+
+    if (isCorrect) {
+      correct++;
+      card.classList.add('correct');
+      fb.textContent = '✓ Correct!';
+      fb.className = 'q-feedback show ok';
+    } else {
+      wrong++;
+      card.classList.add('wrong');
+      fb.textContent = `✗ Incorrect. The correct answer${q.correctTexts.length > 1 ? 's are' : ' is'} highlighted above.`;
+      fb.className = 'q-feedback show err';
+    }
+  });
+
+  // Show results panel
+  const total = shuffledQuestions.length;
+  const pct   = Math.round((correct / total) * 100);
+  document.getElementById('score-val').textContent = correct;
+
+  let grade, sub, ringColor;
+  if (pct >= 90)      { grade = 'Excellent!'; sub = 'Outstanding performance!'; ringColor = '#3fb950'; }
+  else if (pct >= 75) { grade = 'Good Job!';  sub = 'Solid understanding of the material.'; ringColor = '#58a6ff'; }
+  else if (pct >= 60) { grade = 'Pass';        sub = 'Review the highlighted answers to improve.'; ringColor = '#e3b341'; }
+  else                { grade = 'Keep Studying'; sub = 'Go over the course material and try again.'; ringColor = '#f85149'; }
+
+  document.getElementById('grade-label').textContent = grade;
+  document.getElementById('grade-sub').textContent   = sub;
+  document.getElementById('score-ring').style.setProperty('border-color', ringColor, '');
+  document.getElementById('score-ring').style.background = `${ringColor}18`;
+  document.getElementById('score-ring').style.borderColor = ringColor;
+  document.getElementById('stat-c').textContent = correct;
+  document.getElementById('stat-w').textContent = wrong;
+  document.getElementById('stat-s').textContent = skipped;
+
+  const resultsEl = document.getElementById('results');
+  resultsEl.style.display = 'block';
+  document.getElementById('btn-submit').disabled = true;
+
+  resultsEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+/* ─── Reset ─── */
+function resetQuiz() {
+  document.getElementById('results').style.display = 'none';
+  document.getElementById('btn-submit').disabled = false;
+  buildQuiz();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+/* ─── Init ─── */
+buildQuiz();
+</script>
+</body>
+</html>
