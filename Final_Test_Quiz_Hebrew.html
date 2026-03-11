@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>מבחן סיום – ניהול פרויקטים בתעשיית ה-Hitech</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --card: #1c2128;
+    --border: #30363d;
+    --accent: #58a6ff;
+    --accent2: #3fb950;
+    --danger: #f85149;
+    --warn: #e3b341;
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --radius: 10px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Heebo', sans-serif;
+    min-height: 100vh;
+    padding: 0 0 60px;
+    direction: rtl;
+  }
+
+  /* ─── Header ─── */
+  header {
+    background: linear-gradient(135deg, #0d1117 0%, #1a2a3a 50%, #0d1117 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 32px 20px 24px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 60% 80% at 50% -20%, rgba(88,166,255,.15) 0%, transparent 70%);
+  }
+  .header-badge {
+    display: inline-block;
+    background: rgba(88,166,255,.12);
+    border: 1px solid rgba(88,166,255,.3);
+    color: var(--accent);
+    font-size: .72rem;
+    font-weight: 600;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    padding: 4px 14px;
+    border-radius: 20px;
+    margin-bottom: 14px;
+  }
+  header h1 {
+    font-size: clamp(1.4rem, 4vw, 2.1rem);
+    font-weight: 700;
+    position: relative;
+  }
+  header p {
+    color: var(--muted);
+    margin-top: 8px;
+    font-size: .9rem;
+    position: relative;
+  }
+
+  /* ─── Progress bar ─── */
+  #progress-wrap {
+    max-width: 800px;
+    margin: 24px auto 0;
+    padding: 0 20px;
+  }
+  .prog-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: .8rem;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+  .prog-bar-track {
+    height: 6px;
+    background: var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .prog-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 10px;
+    transition: width .4s ease;
+    width: 0%;
+  }
+
+  /* ─── Quiz container ─── */
+  #quiz {
+    max-width: 800px;
+    margin: 28px auto 0;
+    padding: 0 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  /* ─── Question card ─── */
+  .q-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    transition: border-color .2s;
+  }
+  .q-card.correct { border-color: rgba(63,185,80,.4); }
+  .q-card.wrong   { border-color: rgba(248,81,73,.35); }
+
+  .q-header {
+    background: var(--surface);
+    padding: 14px 18px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    border-bottom: 1px solid var(--border);
+    flex-direction: row-reverse;
+  }
+  .q-num {
+    flex-shrink: 0;
+    width: 28px; height: 28px;
+    border-radius: 6px;
+    background: rgba(88,166,255,.15);
+    border: 1px solid rgba(88,166,255,.3);
+    color: var(--accent);
+    font-size: .75rem;
+    font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    margin-top: 2px;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+  .q-text {
+    font-size: .97rem;
+    font-weight: 500;
+    line-height: 1.6;
+    flex: 1;
+    text-align: right;
+  }
+  .q-type-tag {
+    flex-shrink: 0;
+    font-size: .65rem;
+    font-weight: 600;
+    letter-spacing: .04em;
+    padding: 3px 8px;
+    border-radius: 4px;
+    margin-top: 3px;
+    white-space: nowrap;
+  }
+  .tag-single { background: rgba(88,166,255,.12); color: var(--accent); border: 1px solid rgba(88,166,255,.2); }
+  .tag-multi  { background: rgba(227,179,65,.1);  color: var(--warn);   border: 1px solid rgba(227,179,65,.2); }
+
+  .q-body { padding: 14px 18px; }
+
+  .q-hint {
+    font-size: .78rem;
+    color: var(--muted);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-direction: row-reverse;
+    justify-content: flex-end;
+  }
+
+  /* ─── Options ─── */
+  .options { display: flex; flex-direction: column; gap: 9px; }
+
+  label.opt {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 11px 14px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background .15s, border-color .15s;
+    user-select: none;
+    flex-direction: row-reverse;
+    text-align: right;
+  }
+  label.opt:hover { background: rgba(255,255,255,.03); border-color: rgba(88,166,255,.3); }
+
+  .opt-indicator {
+    flex-shrink: 0;
+    width: 18px; height: 18px;
+    border: 2px solid var(--border);
+    border-radius: 50%;
+    margin-top: 2px;
+    display: flex; align-items: center; justify-content: center;
+    transition: all .15s;
+    background: transparent;
+  }
+  .multi .opt-indicator { border-radius: 4px; }
+
+  input[type=radio], input[type=checkbox] { display: none; }
+
+  input:checked + .opt-indicator {
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+  input:checked + .opt-indicator::after {
+    content: '✓';
+    color: #000;
+    font-size: .65rem;
+    font-weight: 900;
+    line-height: 1;
+  }
+
+  .opt-text { font-size: .9rem; line-height: 1.6; flex: 1; }
+
+  /* Results reveal */
+  label.opt.reveal-correct { background: rgba(63,185,80,.1); border-color: rgba(63,185,80,.5); }
+  label.opt.reveal-wrong   { background: rgba(248,81,73,.08); border-color: rgba(248,81,73,.4); }
+  label.opt.reveal-missed  { background: rgba(63,185,80,.06); border-color: rgba(63,185,80,.3); outline: 2px dashed rgba(63,185,80,.4); }
+
+  .reveal-correct .opt-text::before { content: '✓ '; color: var(--accent2); font-weight: 700; }
+  .reveal-wrong .opt-text::before   { content: '✗ '; color: var(--danger); font-weight: 700; }
+
+  /* Q feedback */
+  .q-feedback {
+    margin-top: 12px;
+    padding: 10px 14px;
+    border-radius: 7px;
+    font-size: .84rem;
+    line-height: 1.5;
+    display: none;
+    text-align: right;
+  }
+  .q-feedback.show { display: block; }
+  .q-feedback.ok   { background: rgba(63,185,80,.1); border: 1px solid rgba(63,185,80,.3); color: #7ee787; }
+  .q-feedback.err  { background: rgba(248,81,73,.08); border: 1px solid rgba(248,81,73,.25); color: #ff7b72; }
+
+  /* ─── Buttons ─── */
+  #btn-area {
+    max-width: 800px;
+    margin: 28px auto 0;
+    padding: 0 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+  }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 13px 32px;
+    border-radius: 8px;
+    font-size: .95rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: opacity .15s, transform .1s;
+    font-family: 'Heebo', sans-serif;
+  }
+  .btn:active { transform: scale(.97); }
+  .btn-primary {
+    background: var(--accent);
+    color: #000;
+    width: 100%;
+    max-width: 360px;
+    justify-content: center;
+  }
+  .btn-primary:hover { opacity: .88; }
+  .btn-primary:disabled { opacity: .4; cursor: default; }
+  .btn-reset {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    width: 100%;
+    max-width: 360px;
+    justify-content: center;
+  }
+  .btn-reset:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* ─── Results ─── */
+  #results {
+    display: none;
+    max-width: 800px;
+    margin: 28px auto 0;
+    padding: 0 20px;
+  }
+  .results-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 28px 24px;
+    text-align: center;
+  }
+  .score-ring {
+    width: 120px; height: 120px;
+    border-radius: 50%;
+    margin: 0 auto 20px;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    font-size: 2rem; font-weight: 700;
+    position: relative;
+  }
+  .score-ring::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 5px solid var(--border);
+  }
+  .score-ring .score-val { line-height: 1; }
+  .score-ring .score-of  { font-size: .75rem; font-weight: 400; color: var(--muted); margin-top: 2px; }
+
+  .grade-label { font-size: 1.3rem; font-weight: 700; margin-bottom: 8px; }
+  .grade-sub { color: var(--muted); font-size: .9rem; margin-bottom: 20px; }
+
+  .stats-row {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-bottom: 24px;
+  }
+  .stat-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 20px;
+    min-width: 100px;
+  }
+  .stat-box .sv { font-size: 1.4rem; font-weight: 700; }
+  .stat-box .sl { font-size: .72rem; color: var(--muted); margin-top: 2px; }
+  .stat-correct .sv { color: var(--accent2); }
+  .stat-wrong .sv   { color: var(--danger); }
+  .stat-skip .sv    { color: var(--warn); }
+
+  /* ─── Mobile ─── */
+  @media (max-width: 520px) {
+    header { padding: 24px 16px 20px; }
+    .q-header { padding: 12px 14px; gap: 10px; }
+    .q-body { padding: 12px 14px; }
+    .q-num { width: 24px; height: 24px; font-size: .7rem; }
+    .q-text { font-size: .9rem; }
+    .opt-text { font-size: .85rem; }
+    label.opt { padding: 10px 12px; }
+    .results-card { padding: 20px 16px; }
+    .stats-row { gap: 10px; }
+    .stat-box { padding: 10px 14px; min-width: 80px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-badge">ניהול פרויקטים · תעשיית ה-Hitech</div>
+  <h1>מבחן סיום</h1>
+  <p>34 שאלות &nbsp;·&nbsp; שי ארד &nbsp;·&nbsp; כל הנושאים</p>
+</header>
+
+<div id="progress-wrap">
+  <div class="prog-meta">
+    <span id="prog-label">0 / 34 נענו</span>
+    <span id="prog-pct">0%</span>
+  </div>
+  <div class="prog-bar-track"><div class="prog-bar-fill" id="prog-fill"></div></div>
+</div>
+
+<div id="quiz"></div>
+
+<div id="btn-area">
+  <button class="btn btn-primary" id="btn-submit" onclick="submitQuiz()">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1ZM0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm11.78-1.72a.75.75 0 0 0-1.06-1.06L6.75 9.19 5.28 7.72a.75.75 0 0 0-1.06 1.06l2 2a.75.75 0 0 0 1.06 0l4.5-4.5Z"/></svg>
+    שלח מבחן
+  </button>
+  <button class="btn btn-reset" id="btn-reset" onclick="resetQuiz()">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z"/></svg>
+    נקה והתחל מחדש
+  </button>
+</div>
+
+<div id="results">
+  <div class="results-card">
+    <div class="score-ring" id="score-ring">
+      <div class="score-val" id="score-val">–</div>
+      <div class="score-of">/ 34</div>
+    </div>
+    <div class="grade-label" id="grade-label"></div>
+    <div class="grade-sub" id="grade-sub"></div>
+    <div class="stats-row">
+      <div class="stat-box stat-correct"><div class="sv" id="stat-c">0</div><div class="sl">נכון</div></div>
+      <div class="stat-box stat-wrong"><div class="sv" id="stat-w">0</div><div class="sl">שגוי</div></div>
+      <div class="stat-box stat-skip"><div class="sv" id="stat-s">0</div><div class="sl">דולג</div></div>
+    </div>
+    <button class="btn btn-reset" style="margin:0 auto;display:flex;" onclick="resetQuiz()">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z"/></svg>
+      התחל מבחן מחדש
+    </button>
+  </div>
+</div>
+
+<script>
+const QUESTIONS = [
+  {
+    text: "מהם 3 התנאים שמגדירים פרויקט?",
+    type: "multi",
+    correct: [0, 1, 2],
+    options: [
+      "הוא זמני – יש לו תאריך התחלה וסיום מוגדרים",
+      "הוא מייצר תוצר ייחודי (מוצר, שירות או תוצאה)",
+      "הוא מפותח בהדרגה ככל שמתקבל מידע נוסף (Progressive Elaboration)",
+      "הוא פעילות שוטפת וחוזרת על עצמה",
+      "חייב לכלול יותר מ-10 אנשי צוות",
+      "חייב להיות ממומן ממקור חיצוני"
+    ]
+  },
+  {
+    text: "מהם 3 גורמים לכישלון פרויקטים?",
+    type: "multi",
+    correct: [0, 1, 2],
+    options: [
+      "תכנון לקוי וציפיות לא ריאליות",
+      "תקשורת לקויה בין בעלי העניין",
+      "Scope Creep – שינויים בהיקף ללא שליטה",
+      "צוות גדול מדי עם יותר מדי מומחים",
+      "שימוש ב-Agile בפרויקטי תוכנה",
+      "קיום ישיבות סקירה תכופות עם בעלי עניין"
+    ]
+  },
+  {
+    text: "מהם 5 ה-KPIs המרכזיים של פרויקט?",
+    type: "multi",
+    correct: [0, 1, 2, 3, 4],
+    options: [
+      "לוח זמנים – עמידה בזמנים (Schedule)",
+      "תקציב – ביצוע עלויות (Budget)",
+      "היקף – השלמת ה-Scope",
+      "איכות התוצרים (Quality)",
+      "שביעות רצון הלקוח ובעלי העניין",
+      "מספר ישיבות הצוות שנערכו",
+      "מספר שורות הקוד שנכתבו"
+    ]
+  },
+  {
+    text: "מהם שלבי ה-Project Management Life Cycle?",
+    type: "multi",
+    correct: [0, 1, 2, 3, 4],
+    options: [
+      "Initiation – ייזום",
+      "Planning – תכנון",
+      "Execution – ביצוע",
+      "Monitoring & Control – ניטור ובקרה",
+      "Closure – סגירה",
+      "Discovery – גילוי",
+      "Deployment – פריסה"
+    ]
+  },
+  {
+    text: "מהם 3 הכישורים המרכזיים של מנהל פרויקט?",
+    type: "multi",
+    correct: [0, 1, 2],
+    options: [
+      "מנהיגות – הנעה והובלת הצוות",
+      "תקשורת – העברת מידע ברורה לכל הגורמים",
+      "פתרון בעיות וקבלת החלטות תחת אי-ודאות",
+      "כתיבת קוד ופיתוח תוכנה ברמה גבוהה",
+      "ביקורת פיננסית ורו\"ח",
+      "עיצוב גרפי ו-UI/UX"
+    ]
+  },
+  {
+    text: "מהם 5 השלבים ל-Storytelling מוצלח?",
+    type: "multi",
+    correct: [0, 1, 2, 3, 4],
+    options: [
+      "הגדרת ההקשר והסיטואציה",
+      "הצגת האתגר או הבעיה",
+      "הצגת הפתרון וההתמודדות",
+      "שילוב דמויות שהקהל יכול להזדהות איתן",
+      "סיום עם Call to Action ברור",
+      "מילוי כל שקף בגרפים ונתונים",
+      "הימנעות מכל שפה רגשית"
+    ]
+  },
+  {
+    text: "מהם 5 השלבים בתהליך Waterfall?",
+    type: "multi",
+    correct: [0, 1, 2, 3, 4],
+    options: [
+      "איסוף ואנליזת דרישות (Requirements)",
+      "עיצוב המערכת (Design)",
+      "פיתוח ומימוש (Implementation)",
+      "בדיקות ואימות (Testing)",
+      "פריסה ותחזוקה (Deployment & Maintenance)",
+      "Sprint Review ורטרוספקטיבה",
+      "Backlog Grooming"
+    ]
+  },
+  {
+    text: "מהם החסרונות העיקריים של תהליך Waterfall?",
+    type: "multi",
+    correct: [0, 1, 2],
+    options: [
+      "נוקשות – קשה להכניס שינויים לאחר תחילת הפרויקט",
+      "הבדיקות מתרחשות מאוחר, ולכן תיקון באגים יקר מאוד",
+      "הלקוח רואה את המוצר הסופי רק בסוף התהליך",
+      "יותר מדי איטרציות מקשות על מעקב",
+      "מחייב Daily Standup יומי",
+      "אין תיעוד (Documentation) בתהליך Waterfall"
+    ]
+  },
+  {
+    text: "מהם 5 השלבים בתהליך Agile?",
+    type: "multi",
+    correct: [0, 1, 2, 3, 4],
+    options: [
+      "Concept – רעיון ותפיסה ראשונית",
+      "Inception – דרישות והגדרת בסיס",
+      "Iteration – ספרינטים חוזרים של פיתוח",
+      "Release – שחרור לסביבת ייצור",
+      "Maintenance – תחזוקה ו-Feedback מתמשך",
+      "Waterfall Transition – מעבר לשיטה הסדרתית",
+      "Final Freeze – הקפאת גרסה סופית"
+    ]
+  },
+  {
+    text: "מהי User Story?",
+    type: "single",
+    correct: [0],
+    options: [
+      "תיאור קצר של פיצ'ר מנקודת מבט המשתמש הסופי, בפורמט: 'As a [user], I want [goal] so that [benefit]'",
+      "מסמך מפרט טכני הנכתב על ידי מפתחים בכירים",
+      "מסמך Test Case מפורט שנכתב על ידי QA",
+      "Project Charter שמאושר על ידי ה-Sponsor",
+      "סדר יום לישיבת Sprint Planning"
+    ]
+  },
+  {
+    text: "מהו Sprint?",
+    type: "single",
+    correct: [0],
+    options: [
+      "איטרציה קצובה בזמן (1–4 שבועות בד\"כ) ב-Scrum שבה מסיימים קבוצת פריטים מה-Backlog",
+      "ישיבת Daily Standup יומית של 15 דקות",
+      "שחרור גרסה לסביבת הייצור",
+      "באג קריטי במערכת ה-Tracking",
+      "מסמך הכולל את כל דרישות הפרויקט"
+    ]
+  },
+  {
+    text: "מהם 3 טקסי (Ceremonies) ה-Agile?",
+    type: "multi",
+    correct: [0, 1, 2],
+    options: [
+      "Sprint Planning",
+      "Daily Standup (Daily Scrum)",
+      "Sprint Retrospective",
+      "ישיבת Kickoff לפרויקט",
+      "סקירת תקציב שנתית",
+      "מצגת רבעונית לבעלי עניין"
+    ]
+  },
+  {
+    text: "מהם 3 עמודי התווך של גישת Scrum?",
+    type: "multi",
+    correct: [0, 1, 2],
+    options: [
+      "Transparency – שקיפות מלאה בכל עבודת הצוות",
+      "Inspection – בדיקה שוטפת של ההתקדמות",
+      "Adaptation – התאמה וגמישות בעקבות הממצאים",
+      "Velocity – מדידת קצב עבודת הצוות",
+      "Collaboration – עבודה משותפת עם בעלי עניין",
+      "Estimation – הערכת Story Points לכל משימה"
+    ]
+  },
+  {
+    text: "מהי הפרקטיקה המרכזית של גישת Kanban?",
+    type: "single",
+    correct: [0],
+    options: [
+      "ויזואליזציה של זרימת העבודה על לוח והגבלת WIP (Work In Progress)",
+      "קיום רטרוספקטיבה יומית עם כל הצוות",
+      "חלוקת העבודה לספרינטים של שבועיים עם Backlog ייעודי",
+      "שימוש ב-Product Backlog ו-Story Points לתעדוף",
+      "מינוי Scrum Master להסרת חסמים מדי יום"
+    ]
+  },
+  {
+    text: "מהו WBS?",
+    type: "single",
+    correct: [0],
+    options: [
+      "Work Breakdown Structure – פירוק היררכי של ה-Scope לתוצרים ניתנים לניהול",
+      "Weekly Budget Summary – דוח פיננסי שבועי לספונסרים",
+      "Workflow Building System – כלי לאוטומציה של תהליכים",
+      "Work Balance Sheet – מסמך HR להקצאת משאבים",
+      "Waterfall Breakdown Schedule – לוח זמנים שלבי לפרויקטים סדרתיים"
+    ]
+  },
+  {
+    text: "מהו SOW?",
+    type: "single",
+    correct: [0],
+    options: [
+      "Statement of Work – מסמך רשמי המגדיר את ה-Scope, התוצרים, לוחות הזמנים ותנאי החוזה",
+      "Scope of Workflow – תרשים המציג את כל משימות הפרויקט",
+      "Summary of Work – סיכום שבועי קצר שנשלח לבעלי עניין",
+      "Schedule of Warnings – רשימת סיכונים בסביבת Agile",
+      "System of Work – מסגרת מתודולוגית לפרודוקטיביות"
+    ]
+  },
+  {
+    text: "מהם 3 פרקטיקות מפתח בניהול צוות?",
+    type: "multi",
+    correct: [0, 1, 2],
+    options: [
+      "תקשורת ברורה של מטרות, תפקידים וציפיות",
+      "האצלת סמכויות לפי כישורי אנשי הצוות",
+      "מתן פידבק שוטף ומעקב אחר ביצועים",
+      "מיקרו-מנג'מנט של כל פעולה של כל חבר צוות",
+      "הימנעות מקונפליקטים על ידי התעלמות מהם",
+      "ביטול ישיבות צוות כדי לחסוך זמן"
+    ]
+  },
+  {
+    text: "אילו סוגי תלויות (Dependencies) קיימים בניהול זמן?",
+    type: "multi",
+    correct: [0, 1, 2, 3],
+    options: [
+      "Finish-to-Start (FS) – משימה B מתחילה רק אחרי שמשימה A מסתיימת",
+      "Start-to-Start (SS) – משימה B מתחילה כשמשימה A מתחילה",
+      "Finish-to-Finish (FF) – משימה B מסתיימת כשמשימה A מסתיימת",
+      "Start-to-Finish (SF) – משימה B מסתיימת אחרי שמשימה A מתחילה",
+      "End-to-Begin (EB) – סוג תלות לא סטנדרטי שאינו קיים",
+      "Parallel-to-Series (PS) – משימות שרצות במקביל וסדרתית בו-זמנית"
+    ]
+  },
+  {
+    text: "מהם היתרונות המרכזיים של ניהול זמן אפקטיבי?",
+    type: "multi",
+    correct: [0, 1, 2],
+    options: [
+      "עמידה בלוחות זמנים ואספקה בזמן",
+      "ניצול משאבים טוב יותר וצמצום בזבוז",
+      "הפחתת לחץ ושיפור מורל הצוות",
+      "ביטול מוחלט של כל סיכוני הפרויקט",
+      "אישור תקציב אוטומטי מבעלי עניין",
+      "ערובה לשביעות רצון הלקוח ללא בקרת איכות"
+    ]
+  },
+  {
+    text: "מהם הפריטים הנפוצים בניהול תקציב?",
+    type: "multi",
+    correct: [0, 1, 2, 3],
+    options: [
+      "עלויות כוח אדם ומשאבי אנוש",
+      "עלויות ציוד וחומרים",
+      "עלויות תקורה (Overhead) ועלויות אדמיניסטרטיביות",
+      "רזרבת סיכונים (Contingency Reserve)",
+      "הוצאות אישיות של עובדים",
+      "עלויות קמפיין שיווקי (לא חלק מתקציב הפרויקט)"
+    ]
+  },
+  {
+    text: "מה ההבדל בין T&M ל-Fixed Price?",
+    type: "single",
+    correct: [0],
+    options: [
+      "T&M (Time & Materials): הלקוח משלם על שעות עבודה בפועל + חומרים. Fixed Price: מחיר כולל מוסכם מראש ללא קשר למאמץ בפועל",
+      "T&M: חוזה קבוע עם תשלומים לפי אבני דרך. Fixed Price: תשלום לפי שעה",
+      "T&M: מיועד אך ורק לפרויקטי Agile. Fixed Price: מיועד אך ורק ל-Waterfall",
+      "T&M: הספק לוקח על עצמו את כל הסיכון. Fixed Price: הלקוח לוקח את כל הסיכון",
+      "אין הבדל מהותי – שניהם מבוססים על תוצרים שהושלמו"
+    ]
+  },
+  {
+    text: "מהם 3 רמות האיכות (Quality) בניהול פרויקטים?",
+    type: "multi",
+    correct: [0, 1, 2],
+    options: [
+      "Quality Planning – הגדרת תקני האיכות ודרכי השגתם",
+      "Quality Assurance – ביקורת תהליכים לאימות שהסטנדרטים מקוימים",
+      "Quality Control – בדיקה ומדידת תוצרים מול הסטנדרטים",
+      "Quality Enforcement – אכיפה באמצעות סנקציות כספיות",
+      "Quality Reporting – יצירת דשבורדים לדיווח להנהלה בלבד",
+      "Quality Estimation – ניבוי רמת האיכות לפני תחילת העבודה"
+    ]
+  },
+  {
+    text: "מהו תהליך ניהול ה-Stakeholders?",
+    type: "multi",
+    correct: [0, 1, 2, 3, 4],
+    options: [
+      "זיהוי בעלי העניין",
+      "ניתוח השפעתם, עניינם וציפיותיהם",
+      "תכנון אסטרטגיית המעורבות",
+      "ניהול תקשורת ומעורבות שוטפת",
+      "ניטור אפקטיביות המעורבות ועדכון הגישה",
+      "הסרת בעלי עניין בעלי עניין נמוך מכל התקשורת",
+      "יצירת Product Backlog נפרד לכל Stakeholder"
+    ]
+  },
+  {
+    text: "מהם 3 סוגי הסיכונים בניהול פרויקטים?",
+    type: "multi",
+    correct: [0, 1, 2],
+    options: [
+      "Known Risks – סיכונים מזוהים ומתוכננים מראש",
+      "Known Unknowns – תחומי אי-ודאות שאנו יודעים שקיימים",
+      "Unknown Unknowns – סיכונים שלא ניתן לצפות אותם כלל",
+      "Internal Risks Only – סיכונים מבפנים בלבד",
+      "Fixed Risks – סיכונים שאינם משתנים לאורך הפרויקט",
+      "Zero Risks – פרויקטים ללא סיכונים מזוהים"
+    ]
+  },
+  {
+    text: "אילו פרמטרים חייבים להעריך עבור כל סיכון?",
+    type: "multi",
+    correct: [0, 1, 2],
+    options: [
+      "Probability – הסתברות להתרחשות הסיכון",
+      "Impact – חומרת ההשפעה אם הסיכון יתממש",
+      "Risk Score = Probability × Impact (לתעדוף הסיכונים)",
+      "שם איש הצוות שזיהה את הסיכון",
+      "צבע הקידוד בדשבורד הפרויקט",
+      "מספר הפעמים שהסיכון עלה בישיבות"
+    ]
+  },
+  {
+    text: "מהו RACI?",
+    type: "single",
+    correct: [0],
+    options: [
+      "מטריצת הגדרת אחריות: Responsible, Accountable, Consulted, Informed – מגדיר תפקידים לכל משימה",
+      "רשימת בדיקת סיכונים: Risk, Assumption, Constraint, Issue",
+      "מודל ביצוע פרויקט: Results, Accuracy, Compliance, Integrity",
+      "מסגרת Agile: Release, Adapt, Collaborate, Iterate",
+      "פרוטוקול תקשורת: Report, Alert, Confirm, Implement"
+    ]
+  },
+  {
+    text: "מהם שני גישות התקשורת בניהול פרויקטים?",
+    type: "multi",
+    correct: [0, 1],
+    options: [
+      "Push Communication – השולח מעביר מידע באופן אקטיבי (אימיילים, דוחות)",
+      "Pull Communication – המקבל ניגש למידע לפי צורך (פורטלים, בסיסי ידע)",
+      "Loud Communication – הכרזות בישיבות צוות",
+      "Silent Communication – תקשורת לא-מילולית בלבד",
+      "Reactive Communication – תגובה רק כשנשאלים"
+    ]
+  },
+  {
+    text: "מהם 3 הפרמטרים המרכזיים להערכת שינוי בפרויקט?",
+    type: "multi",
+    correct: [0, 1, 2],
+    options: [
+      "השפעה על ה-Scope",
+      "השפעה על לוח הזמנים",
+      "השפעה על התקציב",
+      "השפעה על ימי החופשה של אנשי הצוות",
+      "השפעה על שם הפרויקט ומיתוגו",
+      "השפעה על סידורי המשרד"
+    ]
+  },
+  {
+    text: 'כתוב את שאילתת Jira הבאה: כל הכרטיסים הפתוחים (לא Closed) המחוברים ל-Epic בשם "Panda" בפרויקט "Bear"',
+    type: "single",
+    correct: [0],
+    options: [
+      'project = "Bear" AND "Epic Link" = "Panda" AND status != Closed',
+      'project = "Bear" AND sprint = "Panda" AND status = Open',
+      'epic = "Panda" AND project != "Bear" AND status != Done',
+      'project = "Bear" AND label = "Panda" AND status = Closed',
+      'project IN ("Bear", "Panda") AND status != Closed'
+    ]
+  },
+  {
+    text: "כתוב את שאילתת Jira הבאה: כל ה-Bugs שנוצרו ב-365 הימים האחרונים עם Severity של Critical",
+    type: "single",
+    correct: [0],
+    options: [
+      "issuetype = Bug AND created >= -365d AND priority = Critical",
+      "issuetype = Bug AND updated >= -365d AND severity = High",
+      "type = Bug AND createdDate = last365days AND priority = Blocker",
+      "issuetype = Bug AND created <= -365d AND priority = Critical",
+      "project = ALL AND issuetype = Bug AND time = 365 AND priority = Critical"
+    ]
+  },
+  {
+    text: "מהם ההבדלים המרכזיים בניהול גלובלי (Global Management)?",
+    type: "multi",
+    correct: [0, 1, 2],
+    options: [
+      "ניהול מעבר לאזורי זמן שונים ושעות עבודה שונות",
+      "ניווט מסגרות חוקיות, רגולטוריות ותאימות שונות בכל מדינה",
+      "תיאום צוותים מבוזרים עם סגנונות תקשורת ועבודה שונים",
+      "כל הצוותים הגלובליים חייבים להשתמש באותה מתודולוגיה בדיוק",
+      "הבדלי שפה לא רלוונטיים כשכולם מדברים אנגלית",
+      "מרחק פיזי אינו משפיע על שיתוף הפעולה בצוות"
+    ]
+  },
+  {
+    text: "מהם ההבדלים התרבותיים המרכזיים בניהול גלובלי?",
+    type: "multi",
+    correct: [0, 1, 2],
+    options: [
+      "יחס שונה להיררכיה וסמכות (Power Distance גבוה לעומת נמוך)",
+      "סגנונות תקשורת שונים: ישיר (Low-Context) לעומת עקיף (High-Context)",
+      "גישה שונה לזמן, דיוק ועמידה בלוחות זמנים",
+      "לכל התרבויות ציפיות זהות לגבי פידבק וביקורת",
+      "הבדלים תרבותיים רלוונטיים רק לצוותים מול לקוחות",
+      "שיטות ניהול מערביות מקובלות אוניברסלית"
+    ]
+  },
+  {
+    text: "מהו ZOPA?",
+    type: "single",
+    correct: [0],
+    options: [
+      "Zone Of Possible Agreement – תחום החפיפה בין מה שהקונה מוכן לשלם לבין מה שהמוכר מוכן לקבל",
+      "Zero Overhead Project Approach – מתודולוגיה לצמצום עלויות בפרויקטים Lean",
+      "Zone of Project Accountability – מטריצת אחריות דומה ל-RACI",
+      "Zero Out Project Assumptions – טכניקה להסרת הנחות לפני תחילת התכנון",
+      "Zone of Performance Assessment – מסגרת הערכת KPIs רבעונית"
+    ]
+  },
+  {
+    text: "מהו המשפט המרכזי (Key Statement) בניהול משא ומתן (Negotiation Management)?",
+    type: "single",
+    correct: [0],
+    options: [
+      "המשא ומתן שואף להסכמה שמיטיבה עם שני הצדדים (Win-Win); יש להתמקד באינטרסים ולא בעמדות",
+      "מטרת המשא ומתן היא שצד אחד ינצח בעוד השני ויתר על הכול",
+      "משא ומתן אפקטיבי פירושו הימנעות מכל פשרה לשמירת עמדה חזקה",
+      "ניהול משא ומתן מבוסס על טקטיקות לחץ וסגירת דילים מהירה",
+      "האסטרטגיה הטובה ביותר היא לעולם לא לחשוף את ה-Bottom Line שלך"
+    ]
+  }
+];
+
+/* ─── Shuffle ─── */
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+/* ─── Build ─── */
+let shuffledQuestions = [];
+
+function buildQuiz() {
+  shuffledQuestions = QUESTIONS.map((q) => {
+    const correctTexts = q.correct.map(i => q.options[i]);
+    const shuffledOpts = shuffle(q.options);
+    return { ...q, shuffledOpts, correctTexts };
+  });
+
+  const container = document.getElementById('quiz');
+  container.innerHTML = '';
+
+  shuffledQuestions.forEach((q, qi) => {
+    const isMulti   = q.type === 'multi';
+    const inputType = isMulti ? 'checkbox' : 'radio';
+    const tagClass  = isMulti ? 'tag-multi' : 'tag-single';
+    const tagText   = isMulti ? 'בחירה מרובה' : 'בחירה יחידה';
+    const hintText  = isMulti
+      ? `בחר את כל התשובות הנכונות (${q.correct.length} תשובות נכונות)`
+      : 'בחר תשובה אחת';
+
+    const optionsHTML = q.shuffledOpts.map((opt, oi) => `
+      <label class="opt ${isMulti ? 'multi' : ''}" id="lbl-${qi}-${oi}">
+        <input type="${inputType}" name="q${qi}" value="${oi}" onchange="onAnswer(${qi})">
+        <span class="opt-indicator"></span>
+        <span class="opt-text">${opt}</span>
+      </label>
+    `).join('');
+
+    container.innerHTML += `
+      <div class="q-card" id="qcard-${qi}">
+        <div class="q-header">
+          <div class="q-num">${qi + 1}</div>
+          <div class="q-text">${q.text}</div>
+          <div class="q-type-tag ${tagClass}">${tagText}</div>
+        </div>
+        <div class="q-body">
+          <div class="q-hint">${hintText}</div>
+          <div class="options" id="opts-${qi}">${optionsHTML}</div>
+          <div class="q-feedback" id="fb-${qi}"></div>
+        </div>
+      </div>
+    `;
+  });
+
+  updateProgress();
+}
+
+function onAnswer() { updateProgress(); }
+
+/* ─── Progress ─── */
+function updateProgress() {
+  let answered = 0;
+  shuffledQuestions.forEach((q, qi) => {
+    if (document.querySelectorAll(`input[name="q${qi}"]:checked`).length > 0) answered++;
+  });
+  const total = shuffledQuestions.length;
+  const pct   = Math.round((answered / total) * 100);
+  document.getElementById('prog-label').textContent = `${answered} / ${total} נענו`;
+  document.getElementById('prog-pct').textContent   = `${pct}%`;
+  document.getElementById('prog-fill').style.width  = `${pct}%`;
+}
+
+/* ─── Submit ─── */
+function submitQuiz() {
+  let correct = 0, wrong = 0, skipped = 0;
+
+  shuffledQuestions.forEach((q, qi) => {
+    const checked = Array.from(document.querySelectorAll(`input[name="q${qi}"]:checked`))
+      .map(el => parseInt(el.value));
+
+    const card = document.getElementById(`qcard-${qi}`);
+    const fb   = document.getElementById(`fb-${qi}`);
+
+    document.querySelectorAll(`input[name="q${qi}"]`).forEach(el => el.disabled = true);
+
+    if (checked.length === 0) {
+      skipped++;
+      card.classList.add('wrong');
+      q.correctTexts.forEach(ct => {
+        const idx = q.shuffledOpts.indexOf(ct);
+        const lbl = document.getElementById(`lbl-${qi}-${idx}`);
+        if (lbl) lbl.classList.add('reveal-missed');
+      });
+      fb.textContent = 'לא נענה – לא נבחרה תשובה.';
+      fb.className = 'q-feedback show err';
+      return;
+    }
+
+    const selectedTexts = checked.map(i => q.shuffledOpts[i]);
+    const isCorrect =
+      selectedTexts.length === q.correctTexts.length &&
+      selectedTexts.every(t => q.correctTexts.includes(t));
+
+    checked.forEach(i => {
+      const lbl = document.getElementById(`lbl-${qi}-${i}`);
+      if (!lbl) return;
+      lbl.classList.add(q.correctTexts.includes(q.shuffledOpts[i]) ? 'reveal-correct' : 'reveal-wrong');
+    });
+
+    if (!isCorrect) {
+      q.correctTexts.forEach(ct => {
+        const idx = q.shuffledOpts.indexOf(ct);
+        const lbl = document.getElementById(`lbl-${qi}-${idx}`);
+        if (lbl && !lbl.classList.contains('reveal-correct')) lbl.classList.add('reveal-missed');
+      });
+    }
+
+    if (isCorrect) {
+      correct++;
+      card.classList.add('correct');
+      fb.textContent = '✓ נכון!';
+      fb.className = 'q-feedback show ok';
+    } else {
+      wrong++;
+      card.classList.add('wrong');
+      fb.textContent = `✗ שגוי. התשובה${q.correctTexts.length > 1 ? 'ות הנכונות' : ' הנכונה'} מסומנ${q.correctTexts.length > 1 ? 'ות' : 'ת'} למעלה.`;
+      fb.className = 'q-feedback show err';
+    }
+  });
+
+  const total = shuffledQuestions.length;
+  const pct   = Math.round((correct / total) * 100);
+
+  document.getElementById('score-val').textContent = correct;
+
+  let grade, sub, ringColor;
+  if (pct >= 90)      { grade = 'מצוין!';          sub = 'ביצוע יוצא דופן!';                          ringColor = '#3fb950'; }
+  else if (pct >= 75) { grade = 'כל הכבוד!';        sub = 'הבנה חזקה של החומר.';                       ringColor = '#58a6ff'; }
+  else if (pct >= 60) { grade = 'עובר';              sub = 'כדאי לחזור על התשובות המסומנות.';           ringColor = '#e3b341'; }
+  else                { grade = 'המשך ללמוד';        sub = 'חזור על חומר הקורס ונסה שוב.';              ringColor = '#f85149'; }
+
+  document.getElementById('grade-label').textContent = grade;
+  document.getElementById('grade-sub').textContent   = sub;
+  const ring = document.getElementById('score-ring');
+  ring.style.background   = `${ringColor}18`;
+  ring.style.borderColor  = ringColor;
+  document.getElementById('stat-c').textContent = correct;
+  document.getElementById('stat-w').textContent = wrong;
+  document.getElementById('stat-s').textContent = skipped;
+
+  const resultsEl = document.getElementById('results');
+  resultsEl.style.display = 'block';
+  document.getElementById('btn-submit').disabled = true;
+  resultsEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+/* ─── Reset ─── */
+function resetQuiz() {
+  document.getElementById('results').style.display = 'none';
+  document.getElementById('btn-submit').disabled = false;
+  buildQuiz();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+buildQuiz();
+</script>
+</body>
+</html>
